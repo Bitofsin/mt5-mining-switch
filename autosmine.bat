@@ -1,51 +1,57 @@
 @echo off
-setlocal enabledelayedexpansion
 
-set "primaryProcess=MetaTester64.exe"
-set "secondaryProcess=hellminer.exe"
-set "secondaryParams=-c stratum+ssl://na.luckpool.net:3958 -u WALLET.!ComputerName! -p hybrid --cpu 3"
-set "threshold=1"
+set "primaryProcess=MetaTester64"
+set "secondaryProcess=hellminer"
+set "secondaryParams=-c stratum+ssl://na.luckpool.net:3958 -u WALLET.%ComputerName% -p hybrid --cpu 3"
+set "threshold=0.5"
 
 set "startCount=0"
-set "stopCount=0"
+set "secondaryProcessStarted=false"
 
 :loop
-set "cpuUsage="
-for /f %%P in ('powershell "Get-Counter -Counter '\Process(%primaryProcess%)\% Processor Time' ^| Select-Object -ExpandProperty CounterSamples ^| Measure-Object -Property CookedValue -Maximum ^| Select-Object -ExpandProperty Maximum"') do (
-    set "cpuUsage=%%P"
+set "primaryCpuUsage="
+for /f %%P in ('powershell "Get-WmiObject Win32_PerfFormattedData_PerfProc_Process | Where-Object {$_.Name -eq '%primaryProcess%'} | Measure-Object -Property PercentProcessorTime -Sum | Select-Object -ExpandProperty Sum"') do (
+    set "primaryCpuUsage=%%P"
 )
 
-if defined cpuUsage (
-    set /a cpuUsage=!cpuUsage!  REM No need to divide by 100
-
-    if !cpuUsage! GTR %threshold% (
-        echo %primaryProcess% is using !cpuUsage!%% of CPU. Stopping %secondaryProcess%...
-        taskkill /f /im "!secondaryProcess!" >nul 2>&1
-        set /a stopCount+=1
-        echo Secondary program has been stopped !stopCount! times.
-    ) else (
-        echo %primaryProcess% is using !cpuUsage!%% of CPU.
-        tasklist /fi "imagename eq !secondaryProcess!" | find /i "!secondaryProcess!" >nul
-        if errorlevel 1 (
-            echo Starting !secondaryProcess!...
-            start "" "!secondaryProcess!" %secondaryParams%
-            set /a startCount+=1
-            echo Secondary program has been started !startCount! times.
+if defined primaryCpuUsage (
+    set /a primaryCpuUsage=primaryCpuUsage
+    if %primaryCpuUsage% GTR %threshold% (
+        if %secondaryProcessStarted% == true (
+            echo %primaryProcess% is using %primaryCpuUsage%%% of CPU. Stopping %secondaryProcess%...
+            powershell "Get-Process -Name '%secondaryProcess%' | Stop-Process -Force"
+            set "secondaryProcessStarted=false"
         ) else (
-            echo !secondaryProcess! is already running.
+            echo %primaryProcess% is using %primaryCpuUsage%%% of CPU.
+        )
+    ) else (
+        echo %primaryProcess% is using %primaryCpuUsage%%% of CPU.
+        tasklist /fi "imagename eq %secondaryProcess%" | find /i "%secondaryProcess%" >nul
+        if errorlevel 1 (
+            if not %secondaryProcessStarted% == true (
+                echo Starting %secondaryProcess%...
+                start "" "%secondaryProcess%" %secondaryParams%
+                set /a startCount+=1
+                echo Secondary program has been started %startCount% times.
+                set "secondaryProcessStarted=true"
+            )
+        ) else (
+            echo %secondaryProcess% is already running.
         )
     )
 ) else (
-    REM Assume process is idle when CPU usage is not available
     echo %primaryProcess% is idle.
-    tasklist /fi "imagename eq !secondaryProcess!" | find /i "!secondaryProcess!" >nul
+    tasklist /fi "imagename eq %secondaryProcess%" | find /i "%secondaryProcess%" >nul
     if errorlevel 1 (
-        echo Starting !secondaryProcess!...
-        start "" "!secondaryProcess!" %secondaryParams%
-        set /a startCount+=1
-        echo Secondary program has been started !startCount! times.
+        if not %secondaryProcessStarted% == true (
+            echo Starting %secondaryProcess%...
+            start "" "%secondaryProcess%" %secondaryParams%
+            set /a startCount+=1
+            echo Secondary program has been started %startCount% times.
+            set "secondaryProcessStarted=true"
+        )
     ) else (
-        echo !secondaryProcess! is already running.
+        echo %secondaryProcess% is already running.
     )
 )
 
