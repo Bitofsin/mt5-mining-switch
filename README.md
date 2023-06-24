@@ -39,4 +39,4 @@ This script monitors the CPU usage of a primary process and controls a secondary
 
 Note: This script relies on PowerShell to interact with the system, so make sure PowerShell is available on your system.
 
-Feel free to customize the script to fit your specific requirements. Happy stratagy testing and mining!
+Feel free to customize the script to fit your specific requirements. Happy strategy testing and mining!
