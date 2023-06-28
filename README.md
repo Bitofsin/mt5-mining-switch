@@ -40,3 +40,20 @@ This script monitors the CPU usage of a primary process and controls a secondary
 Note: This script relies on PowerShell to interact with the system, so make sure PowerShell is available on your system.
 
 Feel free to customize the script to fit your specific requirements. Happy strategy testing and mining!
+
+## Release of Liability
+
+By using this script, you acknowledge and agree that:
+
+- The script is provided for informational and educational purposes only. It is not intended for malicious use.
+- You are solely responsible for the usage of this script and any consequences that may arise from it.
+- The author of the script shall not be held liable for any damages or losses caused by the use or misuse of the script.
+- It is your responsibility to use this script in a lawful and ethical manner, adhering to all applicable laws and regulations.
+- The script is provided "as is," without any warranty or guarantee of its functionality, accuracy, or suitability for any purpose.
+
+Use this script at your own risk and discretion. The author disclaims any and all liability for the actions taken or not taken based on the usage of this script.
+
+Please be responsible and respectful when using this script and ensure that you have proper authorization to monitor and control any processes on your system.
+
+If you do not agree with these terms, do not use the script.
+
