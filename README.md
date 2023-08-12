@@ -41,6 +41,26 @@ Note: This script relies on PowerShell to interact with the system, so make sure
 
 Feel free to customize the script to fit your specific requirements. Happy strategy testing and mining!
 
+## Version 2 - Temperature-based Core Adjustment
+
+### How It Works
+
+1. The script still monitors CPU usage but now also monitors CPU temperature using the `MSAcpi_ThermalZoneTemperature` class in the "root/wmi" namespace.
+
+2. Based on the temperature, the script dynamically adjusts the core count for the secondary process.
+
+3. If the temperature exceeds a specified maximum temperature, the script starts the secondary process with a reduced core count.
+
+4. As the temperature drops, the script increases the core count for the secondary process.
+
+5. The script aims to keep a core free (minimum of 1) to ensure system stability.
+
+6. The script continues to repeat this process with a delay of 2 seconds between each iteration.
+
+### Usage
+
+Follow the same usage instructions as in the previous version, adjusting variables and parameters as needed.
+
 ## Release of Liability
 
 By using this script, you acknowledge and agree that:
