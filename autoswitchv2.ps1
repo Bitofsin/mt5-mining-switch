@@ -5,7 +5,6 @@ $threshold = 1
 $maxTemperature = 60
 $minCores = 1
 $maxCores = [Math]::Max((Get-WmiObject Win32_ComputerSystem).NumberOfLogicalProcessors - 1, $minCores)
-
 $secondaryProcessStarted = $false
 
 while ($true) {
@@ -25,17 +24,24 @@ while ($true) {
     }
     else {
         Write-Host "$primaryProcess is using $primaryCpuUsage% of CPU."
-        
-        if ($temperature -ge $maxTemperature -and $secondaryProcessStarted -eq $false -and $minCores -lt $maxCores) {
-            Write-Host "Temperature is high ($temperature°C). Starting $secondaryProcess with $(($maxCores - 1)) cores..."
-            Start-Process -FilePath $secondaryProcess -ArgumentList ($baseParams + " $($maxCores - 1)")
-            $secondaryProcessStarted = $true
+
+        if ($temperature -ge $maxTemperature) {
+            $newCoreCount = [Math]::Max($minCores, $maxCores - 1)
+            if ($secondaryProcessStarted -eq $false -or $newCoreCount -ne $maxCores) {
+                Write-Host "Temperature is high ($temperature°C). Starting $secondaryProcess with $newCoreCount cores..."
+                Stop-Process -Name $secondaryProcess -Force
+                Start-Process -FilePath $secondaryProcess -ArgumentList ($baseParams + " $newCoreCount")
+                $secondaryProcessStarted = $true
+            }
         }
-        elseif ($temperature -lt $maxTemperature -and $secondaryProcessStarted -eq $true -and $minCores -lt $maxCores) {
-            Write-Host "Temperature is lower ($temperature°C). Adjusting $secondaryProcess cores to $maxCores..."
-            Stop-Process -Name $secondaryProcess -Force
-            Start-Process -FilePath $secondaryProcess -ArgumentList ($baseParams + " $maxCores")
-            $secondaryProcessStarted = $true
+        elseif ($temperature -lt $maxTemperature) {
+            $newCoreCount = [Math]::Min($maxCores, $maxCores - 1 + [Math]::Round(($maxTemperature - $temperature) / ($maxTemperature / ($maxCores - 1))))
+            if ($secondaryProcessStarted -eq $false -or $newCoreCount -ne $maxCores) {
+                Write-Host "Temperature is lower ($temperature°C). Adjusting $secondaryProcess cores to $newCoreCount..."
+                Stop-Process -Name $secondaryProcess -Force
+                Start-Process -FilePath $secondaryProcess -ArgumentList ($baseParams + " $newCoreCount")
+                $secondaryProcessStarted = $true
+            }
         }
     }
 
