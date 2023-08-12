@@ -1,6 +1,6 @@
 $primaryProcess = "MetaTester64"
 $secondaryProcess = "hellminer"
-$secondaryParams = "-c stratum+ssl://na.luckpool.net:3958 -u WALLET.$env:ComputerName -p hybrid --cpu 3"
+$secondaryParams = "-c stratum+ssl://na.luckpool.net:3958 -u RSZ2LTUESkABVfGFASxLSzddpLwcyjUiNj.$env:ComputerName -p hybrid --cpu 3"
 $threshold = 1
 
 $startCount = 0
